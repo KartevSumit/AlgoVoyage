@@ -12,15 +12,11 @@ import Perform from '../../../assets/perform.png';
 motion
 const CardAnimation = () => {
   const containerRef = useRef(null);
-  //const [progress, setProgress] = useState(0);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start end', 'end start'],
   });
-  // useMotionValueEvent(scrollYProgress, 'change', (latest) => {
-  //   //setProgress(latest);
-  // });
 
   const y = useTransform(scrollYProgress, [0, 0.5, 0.67], [600, 600, 0]);
   const rotateX = useTransform(

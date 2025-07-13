@@ -1,5 +1,6 @@
 import React from 'react';
 import { AiOutlineLogin } from 'react-icons/ai';
+import { Link } from 'react-router-dom';
 
 function Navbar() {
   return (
@@ -10,10 +11,13 @@ function Navbar() {
         </h1>
       </div>
       <div>
-        <button className="border-2 border-blue-500 hover:scale-90 text-white font-semibold py-2 px-4 rounded-full flex items-center gap-2">
+        <Link
+          to="/authentication/login"
+          className="border-2 border-blue-500 hover:scale-90 text-white font-semibold py-2 px-4 rounded-full flex items-center gap-2"
+        >
           <AiOutlineLogin size={20} />
           Login
-        </button>
+        </Link>
       </div>
     </div>
   );
