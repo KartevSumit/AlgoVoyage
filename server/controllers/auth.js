@@ -11,6 +11,13 @@ export const sendOtp = async (req, res) => {
     //console.log(req.body);
     const { email, password, confirmPassword } = req.body;
 
+    if (!email || !password || !confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'all field are required',
+      });
+    }
+
     if (password !== confirmPassword) {
       return res.status(400).json({
         success: false,
@@ -56,6 +63,7 @@ export const sendOtp = async (req, res) => {
       response: response,
     });
   } catch (error) {
+    console.error('found error', error);
     return res.status(500).json({
       success: false,
       message: 'Error in sending OTP',
@@ -66,6 +74,7 @@ export const sendOtp = async (req, res) => {
 
 export const signIn = async (req, res) => {
   try {
+    //console.log(req);
     const { email, password, otp } = req.body;
 
     if (!email || !password || !otp) {
@@ -79,8 +88,8 @@ export const signIn = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(1);
 
-    console.log(otpStored[0]);
-    if (otpStored[0].otp !== otp) {
+    //console.log(otpStored[0]);
+    if (otpStored[0].otp != otp) {
       return res.status(400).json({
         success: false,
         message: 'Wrong Otp',
@@ -94,12 +103,13 @@ export const signIn = async (req, res) => {
       year: null,
     });
 
-    const user = await User.create({
+    let user = await User.create({
       email: email,
       password: HashedPasssword,
       additionalInfo: profile.id,
     });
 
+    user = user.toObject();
     const payload = {
       email: email,
       id: user.id,
@@ -112,9 +122,11 @@ export const signIn = async (req, res) => {
     user.password = undefined;
 
     const options = {
-      expiresIn: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+      expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
       httpOnly: true,
     };
+
+    // console.log(user);
 
     res.cookie('token', token, options);
     return res.status(201).json({
@@ -143,7 +155,7 @@ export const logIn = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email });
+    let user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({
         success: false,
@@ -151,6 +163,7 @@ export const logIn = async (req, res) => {
       });
     }
 
+    user = user.toObject();
     if (await bcrypt.compare(password, user.password)) {
       const payload = {
         email: email,
@@ -163,8 +176,9 @@ export const logIn = async (req, res) => {
       user.token = token;
       user.password = undefined;
 
+      // console.log(user);
       const options = {
-        expiresIn: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+        expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
         httpOnly: true,
       };
 
@@ -286,7 +300,7 @@ export const resetPasswordToken = async (req, res) => {
       { new: true }
     );
 
-    const url = `http://localhost:3000/update-password/${token}`;
+    const url = `http://localhost:5173/authentication/update-password/${token}`;
 
     await mailSender(
       email,

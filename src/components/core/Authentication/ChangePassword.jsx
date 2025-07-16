@@ -1,40 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { LiaEyeSlash, LiaEye } from 'react-icons/lia';
-import google from '../../../../public/search.png';
-import { setSignUpData, setEmailSent } from '../../../slices/AuthSlice';
-import { sendOtpAction } from '../../../service/operations/AuthApi';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import FormButtons from '../../common/FormButtons';
 
-function Signup() {
-  const { register, setValues, getValue, handleSubmit } = useForm();
-  const [viewPassword, setViewPassword] = useState(false);
+function ChangePassword() {
+  const { register, onSubmit, setValues, getValue } = useForm();
+  const [viewOldPassword, setViewOldPassword] = useState(false);
+  const [viewNewPassword, setViewNewPassword] = useState(false);
   const [viewConfirmPassword, setViewConfirmPassword] = useState(false);
-  const { emailSent, signUpData } = useSelector((state) => state.auth);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (emailSent) {
-      navigate('/authentication/verify-email');
-      dispatch(setEmailSent(false));
-    }
-  }, [emailSent]);
-
-  const onSubmit = (data) => {
-    dispatch(setSignUpData(data));
-    console.log(data);
-    console.log(signUpData);
-    dispatch(sendOtpAction(data));
-  };
-
   return (
     <div className="p-[2px] bg-gradient-to-t from-slate-950 via-slate-900 via-70% to-slate-500 rounded-2xl absolute z-10">
       <div className="p-8 flex flex-col justify-center items-center gap-5 rounded-2xl bg-gradient-to-t from-slate-950 from-80% to-slate-600/20">
-        <h1 className="text-4xl bitcount">Hi There!</h1>
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+        <h1 className="text-4xl bitcount">Update Password</h1>
+        <form action="" className="flex flex-col items-center gap-4">
           <label htmlFor="email" className="flex flex-col gap-2 w-full">
             <h1 className="text-lg ml-2">Email</h1>
             <input
@@ -47,26 +25,49 @@ function Signup() {
             />
           </label>
           <label
-            htmlFor="password"
+            htmlFor="old password"
             className="flex flex-col gap-2 w-full relative"
           >
-            <h1 className="text-lg ml-2">Password</h1>
+            <h1 className="text-lg ml-2">Old Password</h1>
             <input
-              type={viewPassword ? 'text' : 'password'}
+              type={viewOldPassword ? 'text' : 'password'}
               name="password"
               id="password"
               placeholder="enter a strong password"
-              {...register('password', { required: true })}
+              {...register('oldPassword', { required: true })}
               className="w-full bg-slate-800 p-2 px-4 rounded-2xl pr-12 border-2 border-slate-500"
             />
             <button
               type="button"
               className="absolute bottom-3 right-4"
               onClick={() => {
-                setViewPassword((prev) => !prev);
+                setViewOldPassword((prev) => !prev);
               }}
             >
-              {viewPassword ? <LiaEye /> : <LiaEyeSlash />}
+              {viewOldPassword ? <LiaEye /> : <LiaEyeSlash />}
+            </button>
+          </label>
+          <label
+            htmlFor="new password"
+            className="flex flex-col gap-2 w-full relative"
+          >
+            <h1 className="text-lg ml-2">New Password</h1>
+            <input
+              type={viewNewPassword ? 'text' : 'password'}
+              name="newPassword"
+              id="newPassword"
+              placeholder="enter a strong password"
+              {...register('newPassword', { required: true })}
+              className="w-full bg-slate-800 p-2 px-4 rounded-2xl pr-12 border-2 border-slate-500"
+            />
+            <button
+              type="button"
+              className="absolute bottom-3 right-4"
+              onClick={() => {
+                setViewNewPassword((prev) => !prev);
+              }}
+            >
+              {viewNewPassword ? <LiaEye /> : <LiaEyeSlash />}
             </button>
           </label>
           <label
@@ -92,24 +93,11 @@ function Signup() {
               {viewConfirmPassword ? <LiaEye /> : <LiaEyeSlash />}
             </button>
           </label>
-          <button className=" p-2 rounded-full button_shadow bg-slate-950 hover:scale-90">
-            Sign Up
-          </button>
-          <div className="text-slate-500 text-sm text-center mt-1">
-            -------------------- or --------------------
-          </div>
+          <FormButtons text={'Change Password'}></FormButtons>
         </form>
-        <div className="w-full flex flex-col gap-3 items-center">
-          <button className="w-full p-3 rounded-full button_shadow bg-slate-950 hover:scale-90">
-            <div className="flex items-center justify-center gap-4">
-              <img src={google} alt="" className="h-6" />
-              <h1>Sign in with Google</h1>
-            </div>
-          </button>
-        </div>
       </div>
     </div>
   );
 }
 
-export default Signup;
+export default ChangePassword;
