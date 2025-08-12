@@ -99,3 +99,43 @@
   font-weight: 500;
   font-style: normal;
 }
+.loader {
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(
+    165deg,
+    rgba(30, 30, 60, 1) 0%,
+    rgb(50, 50, 80) 40%,
+    rgb(80, 80, 110) 98%,
+    rgb(10, 10, 30) 100%
+  );
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 0 0 20px #0ff3ff40, 0 0 10px #0ff3ff20 inset;
+}
+
+.loader:before {
+  position: absolute;
+  content: "";
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  box-shadow:
+    0 -10px 20px 20px #0ff3ff30 inset,
+    0 -5px 15px 10px #0ff3ff40 inset,
+    0 -2px 5px #0ff3ff80 inset,
+    0 -3px 2px #0ff3ffcc inset,
+    0 2px 0px #0ff3ff,
+    0 2px 3px #0ff3ff90,
+    0 5px 5px #0ff3ff60,
+    0 10px 15px #0ff3ff40,
+    0 10px 20px 20px #0ff3ff20;
+  filter: blur(3px);
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
