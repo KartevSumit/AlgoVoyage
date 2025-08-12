@@ -2,9 +2,10 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import Spinner from '../components/common/Spinner';
+import { RootState } from '../reducers';
 
 function Authentication() {
-  const { loading } = useSelector((state) => state.auth);
+  const { loading } = useSelector((state: RootState) => state.auth);
   return loading ? (
     <Spinner />
   ) : (

@@ -1,4 +1,3 @@
-// src/util/apiConnector.ts
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';

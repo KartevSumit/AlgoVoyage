@@ -77,7 +77,7 @@ export const sendOtp = async (req: Request, res: Response) => {
 
 export const signIn = async (req: Request, res: Response) => {
   try {
-    //console.log(req);
+    console.log(req);
     const { email, password, otp } = req.body;
 
     if (!email || !password || !otp) {
@@ -154,8 +154,9 @@ export const signIn = async (req: Request, res: Response) => {
 export const logIn = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-
+    
     if (!email || !password) {
+      console.log(req.body);
       return res.status(400).json({
         success: false,
         message: 'All fields are required',

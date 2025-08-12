@@ -23,7 +23,7 @@ const authSlice = createSlice({
     },
     setToken(state, action) {
       state.token = action.payload;
-      localStorage.setItem('token', state.token);
+      localStorage.setItem('token', action.payload);
     },
     setEmailSent(state, action) {
       state.emailSent = action.payload;

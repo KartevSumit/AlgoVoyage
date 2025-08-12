@@ -4,9 +4,10 @@ import toast from 'react-hot-toast';
 import google from '../../../assets/search.png';
 import { googleAuthAction } from '../../../service/operations/AuthApi';
 import { useDispatch } from 'react-redux';
+import { ThunkDispatch } from '@reduxjs/toolkit';
 
 function GoogleAuth() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
   const login = useGoogleLogin({
     flow: 'auth-code',
     onSuccess: (tokenResponse) => {

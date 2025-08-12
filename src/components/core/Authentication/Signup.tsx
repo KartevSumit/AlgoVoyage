@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, FieldValues } from 'react-hook-form';
 import { LiaEyeSlash, LiaEye } from 'react-icons/lia';
 import GoogleAuth from './GoogleAuth.js';
 import { setSignUpData, setEmailSent } from '../../../slices/AuthSlice.js';
@@ -7,15 +7,19 @@ import { sendOtpAction } from '../../../service/operations/AuthApi.js';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { RootState } from '../../../reducers';
+import { ThunkDispatch } from '@reduxjs/toolkit';
 
 function Signup() {
-  const { register, setValues, getValue, handleSubmit } = useForm();
+  const { register, handleSubmit } = useForm();
   const [viewPassword, setViewPassword] = useState(false);
   const [viewConfirmPassword, setViewConfirmPassword] = useState(false);
-  const { emailSent, signUpData } = useSelector((state) => state.auth);
+  const { emailSent, signUpData } = useSelector(
+    (state: RootState) => state.auth
+  );
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
+  const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
   useEffect(() => {
     if (emailSent) {
       navigate('/authentication/verify-email');
@@ -23,11 +27,17 @@ function Signup() {
     }
   }, [emailSent]);
 
-  const onSubmit = (data) => {
+  const onSubmit = (data: FieldValues) => {
     dispatch(setSignUpData(data));
     console.log(data);
     console.log(signUpData);
-    dispatch(sendOtpAction(data));
+    dispatch(
+      sendOtpAction({
+        email: data.email,
+        password: data.password,
+        confirmPassword: data.confirmPassword,
+      } as any)
+    );
   };
 
   return (
@@ -39,7 +49,6 @@ function Signup() {
             <h1 className="text-lg ml-2">Email</h1>
             <input
               type="text"
-              name="email"
               id="email"
               placeholder="please enter a valid email"
               {...register('email', { required: true })}
@@ -53,7 +62,6 @@ function Signup() {
             <h1 className="text-lg ml-2">Password</h1>
             <input
               type={viewPassword ? 'text' : 'password'}
-              name="password"
               id="password"
               placeholder="enter a strong password"
               {...register('password', { required: true })}
@@ -76,7 +84,6 @@ function Signup() {
             <h1 className="text-lg ml-2">Confirm Password</h1>
             <input
               type={viewConfirmPassword ? 'text' : 'password'}
-              name="confirmPassword"
               id="confirmPassword"
               placeholder="please confirm password"
               {...register('confirmPassword', { required: true })}

@@ -1,31 +1,43 @@
+// src/service/operations/AuthApi.ts
+
 import { toast } from 'react-hot-toast';
 import { apiConnector } from '../apiConnector';
 import { AUTH_API } from '../api';
 import { setLoading, setToken, setEmailSent } from '../../slices/AuthSlice';
+import { ThunkAction } from '@reduxjs/toolkit';
+import { RootState } from '../../reducers';
+import { AnyAction } from 'redux';
+import axios from 'axios';
+
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  AnyAction
+>;
 
 // 1) SEND OTP
-export function sendOtpAction({ data }) {
+export function sendOtpAction({ data }: { data: any }): AppThunk {
   return async (dispatch, getState) => {
     dispatch(setLoading(true));
     try {
-      console.log(getState().auth.signUpData);
       const { email, password, confirmPassword } = getState().auth.signUpData;
       const response = await apiConnector('POST', AUTH_API.SEND_OTP, {
         email,
         password,
         confirmPassword,
       });
-      console.log(response);
       if (response.data.success) {
         dispatch(setEmailSent(true));
         toast.success('OTP sent! Check your inbox.');
-      } else {
-        throw new Error(response.error || 'Failed to send OTP');
       }
-    } catch (err) {
-      console.error('error:', err);
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        toast.error(err.response?.data?.message || 'Error sending OTP.');
+      } else {
+        toast.error('An unexpected error occurred.');
+      }
       dispatch(setEmailSent(false));
-      toast.error(err.response.data.message || 'Error sending OTP.');
     } finally {
       dispatch(setLoading(false));
     }
@@ -33,12 +45,11 @@ export function sendOtpAction({ data }) {
 }
 
 // 2) SIGN UP (with OTP)
-export function signUpAction(otp) {
+export function signUpAction({otp}: any): AppThunk {
   return async (dispatch, getState) => {
     dispatch(setLoading(true));
     try {
       const { email, password } = getState().auth.signUpData;
-      console.log('damn', email, password, otp);
       const response = await apiConnector('POST', AUTH_API.SIGNIN, {
         email,
         password,
@@ -46,15 +57,15 @@ export function signUpAction(otp) {
       });
       if (response.data.success) {
         const token = response.data.data.token;
-        console.log(response);
         dispatch(setToken(token));
         toast.success('Signup successful!');
-      } else {
-        throw new Error(response.data.message || 'Signup failed');
       }
-    } catch (err) {
-      console.error(err.response.data);
-      toast.error(err.response.data.message || 'Error during signup.');
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        toast.error(err.response?.data?.message || 'Error during signup.');
+      } else {
+        toast.error('An unexpected error occurred.');
+      }
     } finally {
       dispatch(setLoading(false));
     }
@@ -62,7 +73,7 @@ export function signUpAction(otp) {
 }
 
 // 3) LOGIN
-export function loginAction({ email, password }) {
+export function loginAction({ email, password }: Record<string, string>): AppThunk {
   return async (dispatch) => {
     dispatch(setLoading(true));
     try {
@@ -72,15 +83,15 @@ export function loginAction({ email, password }) {
       });
       if (response.data.success) {
         const token = response.data.data.token;
-        console.log(response);
         dispatch(setToken(token));
         toast.success('Logged in successfully');
-      } else {
-        throw new Error(response.data.message || 'Login failed');
       }
-    } catch (err) {
-      console.error(err);
-      toast.error(err.response.data.message || 'Error during login.');
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        toast.error(err.response?.data?.message || 'Error during login.');
+      } else {
+        toast.error('An unexpected error occurred.');
+      }
     } finally {
       dispatch(setLoading(false));
     }
@@ -88,12 +99,18 @@ export function loginAction({ email, password }) {
 }
 
 // 4) CHANGE PASSWORD
+interface ChangePasswordProps {
+  email?: string;
+  oldPassword?: string;
+  newPassword?: string;
+  confirmPassword?: string;
+}
 export function changePasswordAction({
   email,
   oldPassword,
   newPassword,
   confirmPassword,
-}) {
+}: ChangePasswordProps): AppThunk {
   return async (dispatch) => {
     dispatch(setLoading(true));
     try {
@@ -105,12 +122,13 @@ export function changePasswordAction({
       });
       if (response.data.success) {
         toast.success('Password changed successfully');
-      } else {
-        throw new Error(response.data.message || 'Change password failed');
       }
-    } catch (err) {
-      console.error(err);
-      toast.error(err.response.data.message || 'Error changing password.');
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        toast.error(err.response?.data?.message || 'Error changing password.');
+      } else {
+        toast.error('An unexpected error occurred.');
+      }
     } finally {
       dispatch(setLoading(false));
     }
@@ -118,20 +136,21 @@ export function changePasswordAction({
 }
 
 // 5) LOGOUT
-export function logoutAction() {
+export function logoutAction(): AppThunk {
   return async (dispatch) => {
     dispatch(setLoading(true));
     try {
-      const response = await apiConnector('POST', AUTH_API.LOGOUT);
+      const response = await apiConnector('POST', AUTH_API.LOGOUT, null);
       if (response.data.success) {
         dispatch(setToken(null));
         toast.success('Logged out successfully');
-      } else {
-        throw new Error(response.data.message || 'Logout failed');
       }
-    } catch (err) {
-      console.error(err);
-      toast.error(err.response.data.message || 'Error during logout.');
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        toast.error(err.response?.data?.message || 'Error during logout.');
+      } else {
+        toast.error('An unexpected error occurred.');
+      }
     } finally {
       dispatch(setLoading(false));
     }
@@ -139,8 +158,8 @@ export function logoutAction() {
 }
 
 // 6) REQUEST RESET PASSWORD TOKEN
-export function requestResetTokenAction({ email }) {
-  return async (dispatch, getState) => {
+export function requestResetTokenAction({ email }: { email: string }): AppThunk {
+  return async (dispatch) => {
     dispatch(setLoading(true));
     try {
       const response = await apiConnector(
@@ -151,12 +170,13 @@ export function requestResetTokenAction({ email }) {
       if (response.data.success) {
         dispatch(setEmailSent(true));
         toast.success('Reset link sent. Check your inbox.');
-      } else {
-        throw new Error(response.data.message || 'Failed to send reset link');
       }
-    } catch (err) {
-      console.error(err);
-      toast.error(err.response.data.message || 'Error sending reset email.');
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        toast.error(err.response?.data?.message || 'Error sending reset email.');
+      } else {
+        toast.error('An unexpected error occurred.');
+      }
     } finally {
       dispatch(setLoading(false));
     }
@@ -164,7 +184,16 @@ export function requestResetTokenAction({ email }) {
 }
 
 // 7) RESET PASSWORD
-export function resetPasswordAction({ token, password, confirmPassword }) {
+interface ResetPasswordProps {
+  token: string;
+  password?: string;
+  confirmPassword?: string;
+}
+export function resetPasswordAction({
+  token,
+  password,
+  confirmPassword,
+}: ResetPasswordProps): AppThunk {
   return async (dispatch) => {
     dispatch(setLoading(true));
     try {
@@ -175,19 +204,21 @@ export function resetPasswordAction({ token, password, confirmPassword }) {
       });
       if (response.data.success) {
         toast.success('Password reset successfully');
-      } else {
-        throw new Error(response.data.message || 'Reset password failed');
       }
-    } catch (err) {
-      console.error(err);
-      toast.error(err.response.data.message || 'Error resetting password.');
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        toast.error(err.response?.data?.message || 'Error resetting password.');
+      } else {
+        toast.error('An unexpected error occurred.');
+      }
     } finally {
       dispatch(setLoading(false));
     }
   };
 }
 
-export function googleAuthAction({ code }) {
+// 8) GOOGLE AUTH
+export function googleAuthAction({ code }: { code: string }): AppThunk {
   return async (dispatch) => {
     dispatch(setLoading(true));
     try {
@@ -196,12 +227,13 @@ export function googleAuthAction({ code }) {
       });
       if (response.data.success) {
         toast.success(response.data.message);
-      } else {
-        throw new Error(response.data.message || 'Failed to log you in');
       }
-    } catch (err) {
-      console.error(err);
-      toast.error(err.response.data.message || 'Error logging in');
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        toast.error(err.response?.data?.message || 'Error logging in.');
+      } else {
+        toast.error('An unexpected error occurred.');
+      }
     } finally {
       dispatch(setLoading(false));
     }

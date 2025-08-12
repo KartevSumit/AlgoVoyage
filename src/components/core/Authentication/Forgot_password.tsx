@@ -4,12 +4,18 @@ import FormButtons from '../../common/FormButtons';
 import { requestResetTokenAction } from '../../../service/operations/AuthApi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { RootState } from '../../../reducers';
 import { setEmailSent, setSignUpData } from '../../../slices/AuthSlice';
+import { ThunkDispatch } from '@reduxjs/toolkit';
 
+
+interface FormData {
+  email: string;
+}
 function Forgot_password() {
-  const { register, handleSubmit } = useForm();
-  const dispatch = useDispatch();
-  const { emailSent } = useSelector((state) => state.auth);
+  const { register, handleSubmit } = useForm<FormData>();
+  const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
+  const { emailSent } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,7 +25,7 @@ function Forgot_password() {
     }
   }, [emailSent]);
 
-  const onSubmit = (data) => {
+  const onSubmit = (data: FormData) => {
     dispatch(setSignUpData({ email: data.email }));
     dispatch(requestResetTokenAction(data));
   };
@@ -39,7 +45,7 @@ function Forgot_password() {
             placeholder="Enter a valid email"
             {...register('email', { required: true })}
           />
-          <FormButtons text="Send Email"></FormButtons>
+          <FormButtons text="Send Email" type='submit'></FormButtons>
         </form>
       </div>
     </div>

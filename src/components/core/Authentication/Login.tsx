@@ -1,22 +1,23 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, FieldValues } from 'react-hook-form';
 import { LiaEyeSlash, LiaEye } from 'react-icons/lia';
 import { Link } from 'react-router-dom';
 import FormButtons from '../../common/FormButtons';
 import { loginAction } from '../../../service/operations/AuthApi';
 import { useDispatch, useSelector } from 'react-redux';
 import GoogleAuth from './GoogleAuth';
+import { RootState } from '../../../reducers';
+import { ThunkDispatch } from '@reduxjs/toolkit';
 
 function Login() {
-  const { register, handleSubmit, setValues, getValue } = useForm();
+  const { register, handleSubmit } = useForm();
   const [viewPassword, setViewPassword] = useState(false);
-  //const [viewConfirmPassword, setViewConfirmPassword] = useState(false);
-  const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
+  const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
+  const token = useSelector((state: RootState) => state.auth.token);
 
-  const onSubmit = (data) => {
+  const onSubmit = (data: FieldValues) => {
     console.log(data);
-    dispatch(loginAction(data));
+    dispatch(loginAction({ email: data.email, password: data.password }));
     console.log(token);
   };
 
@@ -29,7 +30,6 @@ function Login() {
             <h1 className="text-lg ml-2">Email</h1>
             <input
               type="text"
-              name="email"
               id="email"
               placeholder="please enter a valid email"
               {...register('email', { required: true })}
@@ -43,7 +43,6 @@ function Login() {
             <h1 className="text-lg ml-2">Password</h1>
             <input
               type={viewPassword ? 'text' : 'password'}
-              name="password"
               id="password"
               placeholder="enter a strong password"
               {...register('password', { required: true })}
@@ -65,7 +64,7 @@ function Login() {
               Forgot Password?
             </Link>
           </label>
-          <FormButtons text="Login"></FormButtons>
+          <FormButtons text="Login" type="submit"></FormButtons>
           <div className="text-slate-500 text-sm text-center mt-1">
             -------------------- or --------------------
           </div>

@@ -3,10 +3,11 @@ import { AiOutlineLogin } from 'react-icons/ai';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import Logo from '../../assets/logo.svg';
+import { RootState } from '../../reducers';
 
 function Navbar() {
-  const { token } = useSelector((state) => state.auth);
-  const { dp } = useSelector((state) => state.user);
+  const { token } = useSelector((state: RootState) => state.auth);
+  const { dp } = useSelector((state: RootState) => state.user);
 
   const links = [
     {
@@ -51,7 +52,7 @@ function Navbar() {
         ) : (
           <div className="w-11 h-11 rounded-full overflow-hidden">
             <Link to="/dashboard">
-              <img src={dp} alt="" className="" />
+              <img src={dp||''} alt="" className="" />
             </Link>
           </div>
         )}

@@ -28,7 +28,7 @@ const Home = () => {
             dynamically recommends problems and tracks your progress across
             multiple sites, tailoring difficulty to your rating.
           </p>
-          <Link className="w-fit p-2 px-6 bg-blue-950 rounded-full flex items-center  gap-2">
+          <Link to="/authentication/signup" className="w-fit p-2 px-6 bg-blue-950 rounded-full flex items-center  gap-2">
             <h1 className="text-white text-xl">Let's Practice</h1>
             <FaArrowRight className="text-white" size={20} />
           </Link>

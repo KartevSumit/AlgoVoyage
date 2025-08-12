@@ -1,7 +1,14 @@
 import React, { useState, useRef } from 'react';
 import { motion, useScroll, useMotionValueEvent } from 'motion/react';
 
-const AnimatedText = ({ heading, text, tag }) => {
+interface AnimatedTextProps {
+  heading: string;
+  text: string;
+  tag: string;
+}
+
+
+const AnimatedText = ({ heading, text, tag }: AnimatedTextProps) => {
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,

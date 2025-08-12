@@ -4,7 +4,7 @@ import { LiaEyeSlash, LiaEye } from 'react-icons/lia';
 import FormButtons from '../../common/FormButtons';
 
 function ChangePassword() {
-  const { register, onSubmit, setValues, getValue } = useForm();
+  const { register, handleSubmit } = useForm();
   const [viewOldPassword, setViewOldPassword] = useState(false);
   const [viewNewPassword, setViewNewPassword] = useState(false);
   const [viewConfirmPassword, setViewConfirmPassword] = useState(false);
@@ -17,7 +17,6 @@ function ChangePassword() {
             <h1 className="text-lg ml-2">Email</h1>
             <input
               type="text"
-              name="email"
               id="email"
               placeholder="please enter a valid email"
               {...register('email', { required: true })}
@@ -31,7 +30,6 @@ function ChangePassword() {
             <h1 className="text-lg ml-2">Old Password</h1>
             <input
               type={viewOldPassword ? 'text' : 'password'}
-              name="password"
               id="password"
               placeholder="enter a strong password"
               {...register('oldPassword', { required: true })}
@@ -54,7 +52,6 @@ function ChangePassword() {
             <h1 className="text-lg ml-2">New Password</h1>
             <input
               type={viewNewPassword ? 'text' : 'password'}
-              name="newPassword"
               id="newPassword"
               placeholder="enter a strong password"
               {...register('newPassword', { required: true })}
@@ -77,7 +74,6 @@ function ChangePassword() {
             <h1 className="text-lg ml-2">Confirm Password</h1>
             <input
               type={viewConfirmPassword ? 'text' : 'password'}
-              name="confirmPassword"
               id="confirmPassword"
               placeholder="please confirm password"
               {...register('confirmPassword', { required: true })}

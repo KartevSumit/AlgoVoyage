@@ -1,6 +1,13 @@
 import React from 'react';
 
-function FormButtons({ text, onClick, type, children }) {
+interface Props {
+  text: string;
+  onClick?: () => void;
+  type?: 'button' | 'submit' | 'reset' | undefined;
+  children?: React.ReactNode;
+}
+
+function FormButtons({ text, onClick, type, children }: Props) {
   return (
     <button
       type={type}

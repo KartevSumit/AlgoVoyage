@@ -1,20 +1,22 @@
 import React from 'react';
 import OtpInput from 'react-otp-input';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, FieldValues } from 'react-hook-form';
 import FormButtons from '../../common/FormButtons';
 import { signUpAction } from '../../../service/operations/AuthApi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { RootState } from '../../../reducers';
+import { ThunkDispatch } from '@reduxjs/toolkit';
 
 function VerifyEmail() {
   const { control, handleSubmit } = useForm();
-  const { signUpData } = useSelector((state) => state.auth);
+  const { signUpData } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
 
-  const onSubmit = (data) => {
+  const onSubmit = (data: FieldValues) => {
     console.log('OTP Submitted:', data);
-    dispatch(signUpAction(data.otp));
+    dispatch(signUpAction({otp: data.otp} as any));
   };
 
   return (
@@ -34,7 +36,6 @@ function VerifyEmail() {
                 value={field.value}
                 onChange={field.onChange}
                 numInputs={6}
-                isInputNum={true}
                 shouldAutoFocus={true}
                 renderInput={(props) => <input {...props} placeholder="-" />}
                 inputStyle={{
@@ -64,7 +65,7 @@ function VerifyEmail() {
               />
             )}
           />
-          <FormButtons text="Verify Email" />
+          <FormButtons text="Verify Email" type="submit" />
         </form>
       </div>
     </div>

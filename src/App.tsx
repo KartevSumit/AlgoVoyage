@@ -13,9 +13,10 @@ import VerifyEmail from './components/core/Authentication/VerifyEmail';
 import Contest from './pages/Contest';
 import { useSelector } from 'react-redux';
 import Error from './pages/Error';
+import { RootState } from './reducers';
 
 function App() {
-  const token = useSelector((state) => state.auth.token);
+  const token = useSelector((state: RootState) => state.auth.token);
   return (
     <div className="w-full min-h-screen bg-slate-950 text-white flex flex-col items-center">
       <Navbar />

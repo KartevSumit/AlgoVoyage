@@ -1,10 +1,12 @@
 import React from 'react';
 import { requestResetTokenAction } from '../../../service/operations/AuthApi';
 import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../reducers';
+import { ThunkDispatch } from '@reduxjs/toolkit';
 
 function ConfirmationPage() {
-  const { signUpData } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
+  const { signUpData } = useSelector((state : RootState) => state.auth);
+  const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
 
   const onClick = () => {
     dispatch(requestResetTokenAction(signUpData));

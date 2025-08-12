@@ -1,20 +1,21 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm,FieldValues } from 'react-hook-form';
 import { LiaEyeSlash, LiaEye } from 'react-icons/lia';
 import FormButtons from '../../common/FormButtons';
 import { resetPasswordAction } from '../../../service/operations/AuthApi';
 import { useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams }  from 'react-router-dom';
+import { ThunkDispatch } from '@reduxjs/toolkit';
 
 function UpdatePassword() {
-  const { register, handleSubmit, setValues, getValue } = useForm();
+  const { register, handleSubmit } = useForm();
   const [viewPassword, setViewPassword] = useState(false);
   const [viewConfirmPassword, setViewConfirmPassword] = useState(false);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
   const { token } = useParams();
 
-  const onSubmit = (data) => {
-    dispatch(resetPasswordAction({ ...data, token }));
+  const onSubmit = (data:FieldValues) => {
+    dispatch(resetPasswordAction({ ...data, token } as any));
   };
 
   return (
@@ -32,7 +33,6 @@ function UpdatePassword() {
             <h1 className="text-lg ml-2">Password</h1>
             <input
               type={viewPassword ? 'text' : 'password'}
-              name="password"
               id="password"
               placeholder="enter a strong password"
               {...register('password', { required: true })}
@@ -55,7 +55,6 @@ function UpdatePassword() {
             <h1 className="text-lg ml-2">Confirm Password</h1>
             <input
               type={viewConfirmPassword ? 'text' : 'password'}
-              name="confirmPassword"
               id="confirmPassword"
               placeholder="please confirm password"
               {...register('confirmPassword', { required: true })}

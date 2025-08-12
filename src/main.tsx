@@ -15,15 +15,18 @@ const store = configureStore({
   reducer: rootReducer,
 });
 
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <GoogleOAuthProvider clientId={clientId}>
-      <Provider store={store}>
-        <BrowserRouter>
-          <App />
-          <Toaster />
-        </BrowserRouter>
-      </Provider>
-    </GoogleOAuthProvider>
-  </StrictMode>
-);
+const root = document.getElementById('root');
+if (root) {
+  createRoot(root).render(
+    <StrictMode>
+      <GoogleOAuthProvider clientId={clientId}>
+        <Provider store={store}>
+          <BrowserRouter>
+            <App />
+            <Toaster />
+          </BrowserRouter>
+        </Provider>
+      </GoogleOAuthProvider>
+    </StrictMode>
+  );
+}

@@ -1,15 +1,24 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
-export const axiosInstance = axios.create({});
+type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
-export const apiConnector = async (method, url, body, header, params) => {
-  return axiosInstance({
-    method: method,
-    url: url,
-    data: body ? body : null,
-    headers: header ? header : null,
-    params: params ? params : null,
-  }).catch((error) => {
-    throw error;
-  });
+export const apiConnector = async (
+  
+  method: Method,
+  url: string,
+  data?: Record<string, any> | null,
+  headers?: Record<string, string> | null,
+  params?: Record<string, any> | null
+
+): Promise<AxiosResponse<any>> => {
+  
+  const config: AxiosRequestConfig = {
+    method: method as AxiosRequestConfig['method'],
+    url,
+    data: data ?? undefined,
+    headers: headers ?? undefined,
+    params: params ?? undefined,
+  };
+
+  return axios.request(config);
 };
