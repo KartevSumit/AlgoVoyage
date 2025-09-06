@@ -14,9 +14,12 @@ import Contest from './pages/Contest';
 import { useSelector } from 'react-redux';
 import Error from './pages/Error';
 import { RootState } from './reducers';
+import ProtectedRoute from './middleware/ProtectRoute';
+import CompleteProfileForm from './pages/CompleteProfileForm';
 
 function App() {
-  const token = useSelector((state: RootState) => state.auth.token);
+  const { token } = useSelector((state: RootState) => state.auth);
+  const { user } = useSelector((state: RootState) => state.user);
   return (
     <div className="w-full min-h-screen bg-slate-950 text-white flex flex-col items-center">
       <Navbar />
@@ -46,7 +49,23 @@ function App() {
             element={<ConfirmationPage />}
           />
         </Route>
-        {token && <Route path="/contest" element={<Contest />} />}
+        <Route
+          path="/contest"
+          element={
+            <ProtectedRoute>
+              <Contest />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/complete-profile"
+          element={
+            <ProtectedRoute>
+              <CompleteProfileForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/complete-profile" element={<CompleteProfileForm />} />
         <Route path="*" element={<Error />} />
       </Routes>
     </div>

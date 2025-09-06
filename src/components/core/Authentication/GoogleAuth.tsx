@@ -11,7 +11,6 @@ function GoogleAuth() {
   const login = useGoogleLogin({
     flow: 'auth-code',
     onSuccess: (tokenResponse) => {
-      console.log(tokenResponse.code);
       dispatch(googleAuthAction({ code: tokenResponse.code }));
     },
     onError: () => toast.error('Login Failed. Please retry again'),

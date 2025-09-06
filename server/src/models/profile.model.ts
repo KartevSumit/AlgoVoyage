@@ -2,15 +2,19 @@ import e from 'express';
 import { Schema, model, Document } from 'mongoose';
 
 interface IProfile extends Document {
-  userName: string;
+  firstName: string;
+  lastName: string;
   codeforces: string;
-  image: string;
-  instituteName: string;
-  Year: number;
+  university: string;
+  year: number;
 }
 
 const profileSchema = new Schema<IProfile>({
-  userName: {
+  firstName: {
+    type: String,
+    trim: true,
+  },
+  lastName: {
     type: String,
     trim: true,
   },
@@ -18,14 +22,11 @@ const profileSchema = new Schema<IProfile>({
     type: String,
     trim: true,
   },
-  image: {
-    type: String,
-  },
-  instituteName: {
+  university: {
     type: String,
     trim: true,
   },
-  Year: {
+  year: {
     type: Number,
   },
 });

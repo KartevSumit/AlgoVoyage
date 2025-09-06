@@ -49,8 +49,6 @@ export const googleAuth = async (req: Request, res: Response) => {
         .json({ success: false, message: 'Could not retrieve email from Google payload' });
     }
 
-    console.log('User Payload:', payload);
-
     let userDoc: AnyUserDoc | null = await User.findOne({ email: payload.email }).exec();
 
     if (!userDoc) {

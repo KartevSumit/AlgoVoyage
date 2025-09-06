@@ -13,12 +13,11 @@ export const upcomingContest = async (req: Request, res: Response) => {
       },
       {}
     );
-    //console.log(response);
     return res.status(200).json({
       success: true,
       data: response.data.objects,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };

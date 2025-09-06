@@ -77,7 +77,6 @@ export const sendOtp = async (req: Request, res: Response) => {
 
 export const signIn = async (req: Request, res: Response) => {
   try {
-    console.log(req);
     const { email, password, otp } = req.body;
 
     if (!email || !password || !otp) {
@@ -91,7 +90,6 @@ export const signIn = async (req: Request, res: Response) => {
       .sort({ createdAt: -1 })
       .limit(1);
 
-    //console.log(otpStored[0]);
     if (otpStored[0].otp != otp) {
       return res.status(400).json({
         success: false,
@@ -102,9 +100,7 @@ export const signIn = async (req: Request, res: Response) => {
     const HashedPasssword = await bcrypt.hash(password, 10);
 
     const profile = await Profile.create({
-      userName: null,
       codeforces: null,
-      image: null,
       instituteName: null,
       year: null,
     });
@@ -133,8 +129,6 @@ export const signIn = async (req: Request, res: Response) => {
       httpOnly: true,
     };
 
-    // console.log(user);
-
     res.cookie('token', token, options);
     return res.status(201).json({
       success: true,
@@ -142,7 +136,6 @@ export const signIn = async (req: Request, res: Response) => {
       data: user,
     });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({
       success: false,
       message: 'Internal server error',
@@ -156,15 +149,13 @@ export const logIn = async (req: Request, res: Response) => {
     const { email, password } = req.body;
     
     if (!email || !password) {
-      console.log(req.body);
       return res.status(400).json({
         success: false,
         message: 'All fields are required',
       });
     }
 
-    let user = await User.findOne({ email }).lean().exec();
-
+    let user = await User.findOne({ email }).populate('additionalInfo').exec();
     if (!user) {
       return res.status(400).json({
         success: false,
@@ -191,7 +182,6 @@ export const logIn = async (req: Request, res: Response) => {
       user.token = token;
       user.password = undefined;
 
-      // console.log(user);
       const options = {
         expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
         httpOnly: true,

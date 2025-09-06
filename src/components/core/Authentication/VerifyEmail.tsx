@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../../reducers';
 import { ThunkDispatch } from '@reduxjs/toolkit';
+import { setUser } from '../../../slices/UserSlice';
+import { setLoading, setToken } from '../../../slices/AuthSlice';
 
 function VerifyEmail() {
   const { control, handleSubmit } = useForm();
@@ -14,9 +16,18 @@ function VerifyEmail() {
   const navigate = useNavigate();
   const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
 
-  const onSubmit = (data: FieldValues) => {
-    console.log('OTP Submitted:', data);
-    dispatch(signUpAction({otp: data.otp} as any));
+  const onSubmit = async (data: FieldValues) => {
+    dispatch(setLoading(true));
+    const { token, user } = await dispatch(
+      signUpAction({ otp: data.otp } as any)
+    ).unwrap();
+
+    dispatch(setUser(user));
+    dispatch(setToken(token));
+    if (token) {
+      dispatch(setLoading(false));
+      navigate('/contest');
+    }
   };
 
   return (

@@ -13,8 +13,8 @@ function Card({ heading, text, image }: CardProps) {
     <div className="w-full flex items-center justify-center">
       <div className="w-[60%] flex flex-col justify-center gap-6">
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-semibold text-slate-400">{heading}</h1>
-          <p className="text-sm">{text}</p>
+          <h1 className="text-3xl font-semibold text-slate-400">{heading}</h1>
+          <p className="text-md">{text}</p>
         </div>
         <div
           className="p-[1px] rounded-full w-fit rainbow-border flow-button relative hover:scale-105"

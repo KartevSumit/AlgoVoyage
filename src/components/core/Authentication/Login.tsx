@@ -1,24 +1,34 @@
 import React, { useState } from 'react';
 import { useForm, FieldValues } from 'react-hook-form';
 import { LiaEyeSlash, LiaEye } from 'react-icons/lia';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import FormButtons from '../../common/FormButtons';
 import { loginAction } from '../../../service/operations/AuthApi';
 import { useDispatch, useSelector } from 'react-redux';
 import GoogleAuth from './GoogleAuth';
 import { RootState } from '../../../reducers';
 import { ThunkDispatch } from '@reduxjs/toolkit';
+import { setUser } from '../../../slices/UserSlice';
+import { setLoading, setToken } from '../../../slices/AuthSlice';
 
 function Login() {
   const { register, handleSubmit } = useForm();
   const [viewPassword, setViewPassword] = useState(false);
   const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
-  const token = useSelector((state: RootState) => state.auth.token);
+  const navigate = useNavigate();
+  const onSubmit = async (data: FieldValues) => {
+    dispatch(setLoading(true));
+    const { token, user } = await dispatch(
+      loginAction({ email: data.email, password: data.password })
+    ).unwrap();
 
-  const onSubmit = (data: FieldValues) => {
-    console.log(data);
-    dispatch(loginAction({ email: data.email, password: data.password }));
-    console.log(token);
+    dispatch(setUser(user));
+    dispatch(setToken(token));
+
+    if (token) {
+      dispatch(setLoading(false));
+      navigate('/contest');
+    }
   };
 
   return (

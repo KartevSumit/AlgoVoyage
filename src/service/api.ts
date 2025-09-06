@@ -12,3 +12,8 @@ export const AUTH_API = {
   RESET_PASSWORD: `${BASE_URL}${API_VERSION}/auth/resetPassword`,
   GOOGLE_AUTH: `${BASE_URL}${API_VERSION}/auth/google-auth`,
 };
+
+// Profile API endpoints
+export const PROFILE_API = {
+  CREATE_PROFILE: `${BASE_URL}${API_VERSION}/profile/createProfile`,
+}

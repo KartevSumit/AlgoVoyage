@@ -1,13 +1,13 @@
-// src/service/operations/AuthApi.ts
-
 import { toast } from 'react-hot-toast';
 import { apiConnector } from '../apiConnector';
-import { AUTH_API } from '../api';
+import { AUTH_API, PROFILE_API } from '../api';
 import { setLoading, setToken, setEmailSent } from '../../slices/AuthSlice';
-import { ThunkAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, ThunkAction } from '@reduxjs/toolkit';
 import { RootState } from '../../reducers';
 import { AnyAction } from 'redux';
 import axios from 'axios';
+import { setUser } from '../../slices/UserSlice';
+import { set } from 'react-hook-form';
 
 export type AppThunk<ReturnType = void> = ThunkAction<
   ReturnType,
@@ -45,58 +45,84 @@ export function sendOtpAction({ data }: { data: any }): AppThunk {
 }
 
 // 2) SIGN UP (with OTP)
-export function signUpAction({otp}: any): AppThunk {
-  return async (dispatch, getState) => {
-    dispatch(setLoading(true));
-    try {
-      const { email, password } = getState().auth.signUpData;
-      const response = await apiConnector('POST', AUTH_API.SIGNIN, {
-        email,
-        password,
-        otp,
-      });
-      if (response.data.success) {
-        const token = response.data.data.token;
-        dispatch(setToken(token));
-        toast.success('Signup successful!');
-      }
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        toast.error(err.response?.data?.message || 'Error during signup.');
-      } else {
-        toast.error('An unexpected error occurred.');
-      }
-    } finally {
-      dispatch(setLoading(false));
-    }
-  };
+interface SignUpPayload {
+  email: string;
+  password: string;
+  otp: string;
 }
 
-// 3) LOGIN
-export function loginAction({ email, password }: Record<string, string>): AppThunk {
-  return async (dispatch) => {
-    dispatch(setLoading(true));
-    try {
-      const response = await apiConnector('POST', AUTH_API.LOGIN, {
-        email,
-        password,
-      });
-      if (response.data.success) {
-        const token = response.data.data.token;
-        dispatch(setToken(token));
-        toast.success('Logged in successfully');
-      }
-    } catch (err: unknown) {
-      if (axios.isAxiosError(err)) {
-        toast.error(err.response?.data?.message || 'Error during login.');
-      } else {
-        toast.error('An unexpected error occurred.');
-      }
-    } finally {
-      dispatch(setLoading(false));
-    }
-  };
+interface SignUpResponse {
+  token: string;
+  user: any;
 }
+
+export const signUpAction = createAsyncThunk<
+  SignUpResponse,
+  SignUpPayload,
+  { rejectValue: string }
+>('auth/signUp', async ({ email, password, otp }, { rejectWithValue }) => {
+  try {
+    const response = await apiConnector('POST', AUTH_API.SIGNIN, {
+      email,
+      password,
+      otp,
+    });
+
+    if (response.data.success) {
+      return {
+        token: response.data.data.token,
+        user: response.data.data,
+      };
+    }
+    return rejectWithValue('Signup failed');
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      return rejectWithValue(
+        err.response?.data?.message || 'Error during signup.'
+      );
+    }
+    return rejectWithValue('An unexpected error occurred.');
+  }
+});
+
+// 3) LOGIN
+interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+interface LoginResponse {
+  token: string;
+  user: any;
+}
+
+export const loginAction = createAsyncThunk<
+  LoginResponse,
+  LoginPayload,
+  { rejectValue: string }
+>('auth/login', async ({ email, password }, { rejectWithValue }) => {
+  try {
+    const response = await apiConnector('POST', AUTH_API.LOGIN, {
+      email,
+      password,
+    });
+
+    if (response.data.success) {
+      return {
+        token: response.data.data.token,
+        user: response.data.data,
+      };
+    }
+    return rejectWithValue('Login failed');
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      return rejectWithValue(
+        err.response?.data?.message || 'Error during login.'
+      );
+    }
+    return rejectWithValue('An unexpected error occurred.');
+  }
+});
 
 // 4) CHANGE PASSWORD
 interface ChangePasswordProps {
@@ -105,6 +131,7 @@ interface ChangePasswordProps {
   newPassword?: string;
   confirmPassword?: string;
 }
+
 export function changePasswordAction({
   email,
   oldPassword,
@@ -158,7 +185,11 @@ export function logoutAction(): AppThunk {
 }
 
 // 6) REQUEST RESET PASSWORD TOKEN
-export function requestResetTokenAction({ email }: { email: string }): AppThunk {
+export function requestResetTokenAction({
+  email,
+}: {
+  email: string;
+}): AppThunk {
   return async (dispatch) => {
     dispatch(setLoading(true));
     try {
@@ -173,7 +204,9 @@ export function requestResetTokenAction({ email }: { email: string }): AppThunk 
       }
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
-        toast.error(err.response?.data?.message || 'Error sending reset email.');
+        toast.error(
+          err.response?.data?.message || 'Error sending reset email.'
+        );
       } else {
         toast.error('An unexpected error occurred.');
       }
@@ -189,6 +222,7 @@ interface ResetPasswordProps {
   password?: string;
   confirmPassword?: string;
 }
+
 export function resetPasswordAction({
   token,
   password,
@@ -226,7 +260,10 @@ export function googleAuthAction({ code }: { code: string }): AppThunk {
         code,
       });
       if (response.data.success) {
-        toast.success(response.data.message);
+        const token = response.data.data.token;
+        dispatch(setToken(token));
+        dispatch(setUser(response.data.data));
+        toast.success('Logged in successfully');
       }
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
@@ -239,3 +276,51 @@ export function googleAuthAction({ code }: { code: string }): AppThunk {
     }
   };
 }
+
+interface CompleteProfilePayload {
+  email: string;
+  firstName: string;
+  lastName: string;
+  codeforces: string;
+  university: string;
+  year: number;
+}
+
+interface CompleteProfileResponse {
+  NewUser: any;
+}
+
+// 9) PROFILE
+export const createProfileAction = createAsyncThunk<
+  CompleteProfileResponse,
+  CompleteProfilePayload,
+  { rejectValue: any }
+>(
+  'profile/create',
+  async (data: CompleteProfilePayload, { rejectWithValue }) => {
+    try {
+      const response = await apiConnector(
+        'POST',
+        PROFILE_API.CREATE_PROFILE,
+        data
+      );
+
+      if (response.data.success) {
+        toast.success('Profile created successfully');
+        return { NewUser: response.data.user };
+      } else {
+        return rejectWithValue('Profile creation failed.');
+      }
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const message =
+          err.response?.data?.message || 'Error creating profile.';
+        toast.error(message);
+        return rejectWithValue(message);
+      } else {
+        toast.error('An unexpected error occurred.');
+        return rejectWithValue('Unexpected error');
+      }
+    }
+  }
+);

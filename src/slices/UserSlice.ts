@@ -1,8 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
-import image from '../assets/defaultImage.png'
+import image from '../assets/defaultImage.png';
+
+const getUser = localStorage.getItem('user');
 
 const initialState = {
-  user: localStorage.getItem('user') ? localStorage.getItem('user') : null,
+  user: getUser ? JSON.parse(getUser) : null,
   dp: localStorage.getItem('dp') ? localStorage.getItem('dp') : image,
 };
 
@@ -12,6 +14,7 @@ const userSlice = createSlice({
   reducers: {
     setUser(state, action) {
       state.user = action.payload;
+      localStorage.setItem('user', JSON.stringify(action.payload));
     },
     setDp(state, action) {
       state.dp = action.payload;

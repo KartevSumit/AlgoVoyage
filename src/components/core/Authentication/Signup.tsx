@@ -29,8 +29,6 @@ function Signup() {
 
   const onSubmit = (data: FieldValues) => {
     dispatch(setSignUpData(data));
-    console.log(data);
-    console.log(signUpData);
     dispatch(
       sendOtpAction({
         email: data.email,

@@ -1,4 +1,23 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { jwtDecode } from 'jwt-decode';
+
+interface decodedToken {
+  exp: number;
+}
+
+function getToken(): string | null {
+  const token = localStorage.getItem('token') || null;
+  if (!token) {
+    return null;
+  } else {
+    const decoded: decodedToken = jwtDecode(token);
+    if (decoded.exp < Date.now() / 1000) {
+      localStorage.removeItem('token');
+      return null;
+    }
+    return token;
+  }
+}
 
 const initialState = {
   signUpData: {
@@ -7,7 +26,7 @@ const initialState = {
     confirmPassword: '',
   },
   loading: false,
-  token: localStorage.getItem('token') || null,
+  token: getToken(),
   emailSent: false,
 };
 
